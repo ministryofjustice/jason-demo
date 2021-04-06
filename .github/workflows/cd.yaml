@@ -3,11 +3,7 @@ name: Continuous Deployment
 # For a description of how this works, see this Cloud Platform User Guide page:
 # https://user-guide.cloud-platform.service.justice.gov.uk/documentation/deploying-an-app/github-actions-continuous-deployment.html
 
-on:
-  workflow_dispatch:
-  push:
-    branches:
-      - 'main'
+on: [push, pull_request]
 
 env:
   ECR_NAME: ${{ secrets.ECR_NAME }}
