@@ -46,4 +46,4 @@ jobs:
           kubectl config use-context ${KUBE_CLUSTER}
       - name: Apply the updated manifest
         run: |
-          kubectl -n ${KUBE_NAMESPACE} apply -f kubernetes-deploy.yaml
+          kubectl -n ${KUBE_NAMESPACE} create deployment nginx --image=bitnami/nginx:latest
