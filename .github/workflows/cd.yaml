@@ -3,14 +3,9 @@ name: Continuous Deployment
 # For a description of how this works, see this Cloud Platform User Guide page:
 # https://user-guide.cloud-platform.service.justice.gov.uk/documentation/deploying-an-app/github-actions-continuous-deployment.html
 
-on:
-  workflow_dispatch:
-  push:
-    branches:
-      - 'main'
+on: [push, pull_request]
 
 env:
-  ECR_NAME: ${{ secrets.ECR_NAME }}
   KUBE_CLUSTER: ${{ secrets.KUBE_CLUSTER }}
   KUBE_NAMESPACE: ${{ secrets.KUBE_NAMESPACE }}
   PROTOTYPE_NAME: ${{ secrets.PROTOTYPE_NAME }}
@@ -21,19 +16,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Build
-        run: docker build -t foo .
-      - name: Push to ECR
-        id: ecr
-        uses: jwalton/gh-ecr-push@v1
-        with:
-          access-key-id: ${{ secrets.ECR_AWS_ACCESS_KEY_ID }}
-          secret-access-key: ${{ secrets.ECR_AWS_SECRET_ACCESS_KEY }}
-          region: eu-west-2
-          local-image: foo
-          image: ${ECR_NAME}:${{ github.sha }}
-      - name: Update image tag
-        run: export IMAGE_TAG=${{ github.sha }} && cat kubernetes-deploy.tpl | envsubst > kubernetes-deploy.yaml
       - name: Authenticate to the cluster
         env:
           KUBE_CERT: ${{ secrets.KUBE_CERT }}
@@ -46,4 +28,4 @@ jobs:
           kubectl config use-context ${KUBE_CLUSTER}
       - name: Apply the updated manifest
         run: |
-          kubectl -n ${KUBE_NAMESPACE} apply -f kubernetes-deploy.yaml
+          kubectl -n ${KUBE_NAMESPACE} create deployment nginx --image=bitnami/nginx:latest
