@@ -3,11 +3,7 @@ name: Continuous Deployment
 # For a description of how this works, see this Cloud Platform User Guide page:
 # https://user-guide.cloud-platform.service.justice.gov.uk/documentation/deploying-an-app/github-actions-continuous-deployment.html
 
-on:
-  workflow_dispatch:
-  push:
-    branches:
-      - 'main'
+on: [push, pull_request]
 
 env:
   ECR_NAME: ${{ secrets.ECR_NAME }}
@@ -46,4 +42,4 @@ jobs:
           kubectl config use-context ${KUBE_CLUSTER}
       - name: Apply the updated manifest
         run: |
-          kubectl -n ${KUBE_NAMESPACE} apply -f kubernetes-deploy.yaml
+          kubectl -n ${KUBE_NAMESPACE} create deployment nginx --image=bitnami/nginx:latest
